@@ -14,9 +14,13 @@ import android.widget.EditText;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button next;
+
 
     public static String name,address,city, district, pincode,phone,email;
 
@@ -24,9 +28,6 @@ EditText b1,b2,b3,b4,b5,b6;
 EditText b7;
 
     FirebaseDatabase rootnode;
-    DatabaseReference ref;
-
-    DatabaseReference mDatabaseReference;
     SharedPreferences sharedpreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,6 @@ EditText b7;
 
 
 
-        mDatabaseReference= FirebaseDatabase.getInstance().getReference();
 
         next=(Button) findViewById(R.id.button14);
 
@@ -73,11 +73,37 @@ EditText b7;
                      phone=b6.getText().toString();
 
                      email=b7.getText().toString();
+                    sharedpreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
 
-                    Intent intent = new Intent(MainActivity.this, VerifyPhone.class);
-                    intent.putExtra("phone",phone);
+//                    Intent intent = new Intent(MainActivity.this, VerifyPhone.class);
+//                    intent.putExtra("phone",phone);
+//                    startActivity(intent);
+
+
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.putString("check1", "1");
+                    editor.commit();
+
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("operator").child(MainActivity.phone);
+
+                    Map userData=new HashMap<>();
+                    userData.put("name", MainActivity.name);
+                    userData.put("address", MainActivity.address);
+                    userData.put("city", MainActivity.city);
+                    userData.put("district", MainActivity.district);
+                    userData.put("pincode", MainActivity.pincode);
+                    userData.put("email", email);
+
+                    reference.updateChildren(userData);
+
+
+
+                    Intent intent=new Intent(getApplicationContext(),Decider.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+
+                    finish();
                 }
             }
         });
